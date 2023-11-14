@@ -1,0 +1,147 @@
+
+import UIKit
+import AVFoundation
+enum GameStatus {
+    case start
+    case win
+    case lose
+    case draw
+}
+enum Sign{
+    case rock
+    case paper
+    case scissors 
+}
+
+class ViewController: UIViewController {
+    @IBOutlet weak var signLabel: UILabel!
+    
+    @IBOutlet weak var statusLabel: UILabel!
+    
+    @IBOutlet weak var scissorsButton: UIButton!
+    @IBOutlet weak var rockButton: UIButton!
+    @IBOutlet weak var paperButton: UIButton!
+    @IBOutlet weak var playAgainBtn: UIButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        updateUI(forState: .start)
+    }
+    //function to control the appearance of the interface based on the games's status
+    func updateUI(forState state: GameStatus){
+        switch state{
+        case .start:
+            view.backgroundColor = .gray
+            signLabel.text = "🤖"
+            playAgainBtn.isHidden = true
+            rockButton.isHidden = false
+            paperButton.isHidden = false
+            scissorsButton.isHidden = false
+            statusLabel.text = "Rock, Scissors, Paper?"
+            
+        case .lose:
+            view.backgroundColor = UIColor(red: 0.65, green: 0.79, blue: 0.65, alpha: 1)
+            statusLabel.text = "You lost!"
+            AudioServicesPlaySystemSound(1016)
+            
+        case .win:
+            view.backgroundColor = UIColor(red: 0.85, green: 0.42, blue: 0.41, alpha: 1)
+            statusLabel.text = "You Won!!🥳"
+            AudioServicesPlaySystemSound(1006)
+            
+        case .draw:
+            view.backgroundColor = UIColor(red: 0.85, green: 0.42, blue: 0.41, alpha: 1)
+            statusLabel.text = "It's a draw!"
+            AudioServicesPlaySystemSound(1116)
+            
+        }
+    }
+    
+    @IBAction func rockButtonCL(_ sender: Any){
+        checkResult(userChoice: .rock)
+    }
+    @IBAction func paperButtonCL(_ sender: Any) {
+        checkResult(userChoice: .paper)
+    }
+    
+    @IBAction func scissorsButtonCL(_ sender: Any) {
+        checkResult(userChoice: .scissors)
+    }
+    
+    @IBAction func playAgainBtnCL(_ sender: Any){
+        updateUI(forState: .start)
+    }
+    func checkResult(userChoice: Sign){
+        //make a choice for the machine
+        let i = Int.random(in: 0...2)
+        var computerChoice: Sign = .rock
+        
+        switch i {
+        case 0:
+            computerChoice = .rock
+            signLabel.text = "👊🏾"
+        case 1:
+            computerChoice = .paper
+            signLabel.text = "✋🏾"
+        case 2:
+            computerChoice = .scissors
+            signLabel.text = "✌🏾"
+        default:
+            print("nothing")
+            
+            
+        }
+        //hide all these signs
+        rockButton.isHidden = true
+        paperButton.isHidden = true
+        scissorsButton.isHidden = true
+        playAgainBtn.isHidden = false
+        
+        //show up the user choice
+        if userChoice == .rock{
+            rockButton.isHidden = false
+        }else if userChoice == .paper {
+            paperButton.isHidden = false
+        }else if userChoice == .scissors {
+            scissorsButton.isHidden = false
+        }
+        
+        
+        //make a judgment
+        if userChoice == computerChoice {
+            updateUI(forState: .draw)
+            return
+        }
+        //Game status
+        var userStatus: GameStatus = .win
+        switch userChoice {
+            //
+        case .rock:
+            if computerChoice == .paper {
+                userStatus = .lose
+            } else {
+                userStatus = .win
+            }
+            
+            //
+        case .scissors:
+            if computerChoice == .rock {
+                userStatus = .lose
+            } else {
+                userStatus = .win
+            }
+            
+            //
+        case .paper:
+            if computerChoice == .scissors {
+                userStatus = .lose
+            } else {
+                userStatus = .win
+                
+            }
+        }
+        updateUI(forState: userStatus)
+    }
+    
+}
